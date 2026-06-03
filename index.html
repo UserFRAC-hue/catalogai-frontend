@@ -229,7 +229,7 @@ const SERVER = 'https://catalogai-server.onrender.com';
 let productos = [];
 let estiloSeleccionado = 'Moderno';
 let catalogoData = null;
-let imagenesMap = {};
+let productosBackup = [];
 
 function toast(msg) {
   const t = document.getElementById('toast');
@@ -355,6 +355,7 @@ async function generarCatalogo() {
     const data = await res.json();
     if (data.ok && data.catalogo) {
       catalogoData = data.catalogo;
+      productosBackup = productos.map(p => ({ ...p, imgUsed: false }));
       mostrarResultado(data.catalogo);
     }
   } catch(e) { toast('Error: ' + e.message); }
@@ -363,18 +364,43 @@ async function generarCatalogo() {
   document.getElementById('loading-catalogo').style.display = 'none';
 }
 
+function matchImagen(pNombre) {
+  if (!pNombre) return null;
+  const needle = pNombre.toLowerCase().trim();
+  let best = null, bestScore = 0, bestIdx = -1;
+  productosBackup.forEach((x, i) => {
+    if (!x.imgUrl || x.imgUsed) return;
+    const hay = (x.nombre||'').toLowerCase().trim();
+    let score = 0;
+    if (hay === needle) score = 100;
+    else if (hay.includes(needle) || needle.includes(hay)) score = 50;
+    else { hay.split(' ').forEach(w => { if (needle.includes(w) && w.length > 3) score += 10; }); }
+    if (score > bestScore) { bestScore = score; best = x; bestIdx = i; }
+  });
+  if (best && bestScore > 0) { productosBackup[bestIdx].imgUsed = true; return best.imgUrl; }
+  const unused = productosBackup.find(x => x.imgUrl && !x.imgUsed);
+  if (unused) { unused.imgUsed = true; return unused.imgUrl; }
+  return null;
+}
+
 function mostrarResultado(cat) {
   const cont = document.getElementById('resultado-contenido');
+  const usedImgs = {};
   const cats = (cat.categorias||[]).map(c => `
     <div style="margin-bottom:1.5rem">
       <div class="categoria-titulo">${c.nombre}</div>
-      <div class="productos-grid">
-        ${(c.productos||[]).map(p => {
-          const prod = productos.find(x => x.nombre.toLowerCase().includes((p.nombre||'').toLowerCase().substring(0,8)));
-          const img = prod && prod.imgUrl ? `<img src="${prod.imgUrl}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px">` : '';
-          return `<div class="producto-card">${img}<div class="producto-nombre">${p.nombre}</div><div class="producto-desc">${p.descripcion}</div>${p.precio?'<div class="producto-precio">$'+p.precio+'</div>':''}</div>`;
-        }).join('')}
-      </div>
+      ${(c.productos||[]).map(p => {
+        const img = matchImagen(p.nombre);
+        const imgHtml = img ? `<img src="${img}" style="width:90px;height:90px;object-fit:cover;border-radius:8px;flex-shrink:0">` : `<div style="width:90px;height:90px;border-radius:8px;background:#1a1a1a;border:1px solid #222;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-photo" style="font-size:20px;color:#333"></i></div>`;
+        return `<div style="display:flex;align-items:center;gap:14px;background:#0D0D0D;border:1px solid #1e1e1e;border-radius:12px;padding:12px;margin-bottom:8px">
+          ${imgHtml}
+          <div style="flex:1;min-width:0">
+            <div class="producto-nombre">${p.nombre}</div>
+            <div class="producto-desc" style="margin-top:4px">${p.descripcion}</div>
+            ${p.precio?`<div class="producto-precio" style="margin-top:8px">$${p.precio}</div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
     </div>
   `).join('');
   cont.innerHTML = `<div class="resultado-titulo">${cat.titulo}</div><div class="resultado-desc">${cat.descripcion}</div>${cats}`;
@@ -393,7 +419,7 @@ function descargarPDF() {
   doc.rect(0,0,W,297,'F');
 
   doc.setFont('helvetica','bold');
-  doc.setFontSize(22);
+  doc.setFontSize(20);
   doc.setTextColor(255,255,255);
   doc.text(catalogoData.titulo || empresa, margin, y);
   y += 8;
@@ -409,80 +435,81 @@ function descargarPDF() {
   doc.line(margin, y, W-margin, y);
   y += 8;
 
+  const imgPool = productos.filter(p => p.imgUrl && p.imgUrl.startsWith('data:')).map(p => ({ nombre: p.nombre, img: p.imgUrl, used: false }));
+
+  function getImg(pNombre) {
+    if (!pNombre || !imgPool.length) return null;
+    const needle = pNombre.toLowerCase().trim();
+    let best = null, bestScore = 0, bestIdx = -1;
+    imgPool.forEach((x, i) => {
+      if (x.used) return;
+      const hay = (x.nombre||'').toLowerCase().trim();
+      let score = 0;
+      if (hay === needle) score = 100;
+      else if (hay.includes(needle) || needle.includes(hay)) score = 50;
+      else {
+        hay.split(' ').forEach(w => { if (needle.includes(w) && w.length > 3) score += 10; });
+      }
+      if (score > bestScore) { bestScore = score; best = x; bestIdx = i; }
+    });
+    if (best && bestScore > 0) { imgPool[bestIdx].used = true; return best.img; }
+    const unused = imgPool.find(x => !x.used);
+    if (unused) { unused.used = true; return unused.img; }
+    return null;
+  }
+
+  const cardH = 34;
+  const imgW = 28, imgH = 28;
+
   (catalogoData.categorias || []).forEach(cat => {
-    if (y > 260) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
+    if (y > 265) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
 
     doc.setFont('helvetica','bold');
     doc.setFontSize(8);
     doc.setTextColor(255,255,255);
-    doc.text(cat.nombre.toUpperCase(), margin, y);
+    doc.text((cat.nombre||'').toUpperCase(), margin, y);
+    y += 2;
+    doc.setDrawColor(40,40,40);
+    doc.line(margin, y+1, W-margin, y+1);
     y += 6;
 
-    const cols = 2;
-    const cardW = (W - margin*2 - 8) / cols;
-    let col = 0;
-    let rowY = y;
-
     (cat.productos || []).forEach(p => {
-      const prod = productos.find(x => x.nombre && p.nombre && x.nombre.toLowerCase().includes(p.nombre.toLowerCase().substring(0,6)));
-      const hasImg = prod && prod.imgUrl && prod.imgUrl.startsWith('data:');
-      const cardH = hasImg ? 52 : 24;
+      if (y + cardH > 278) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
 
-      if (rowY + cardH > 275) {
-        doc.addPage();
-        doc.setFillColor(10,10,10);
-        doc.rect(0,0,W,297,'F');
-        rowY = 20; col = 0;
-      }
+      doc.setFillColor(18,18,18);
+      doc.roundedRect(margin, y, W-margin*2, cardH, 3, 3, 'F');
 
-      const x = margin + col * (cardW + 8);
+      const imgData = getImg(p.nombre);
+      let textX = margin + 4;
 
-      doc.setFillColor(20,20,20);
-      doc.roundedRect(x, rowY, cardW, cardH, 3, 3, 'F');
-
-      if (hasImg) {
+      if (imgData) {
         try {
-          doc.addImage(prod.imgUrl, 'JPEG', x+2, rowY+2, cardW-4, 28, '', 'FAST');
+          doc.addImage(imgData, 'JPEG', margin+3, y+3, imgW, imgH, '', 'FAST');
+          textX = margin + imgW + 6;
         } catch(e) {}
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(8);
-        doc.setTextColor(255,255,255);
-        doc.text(p.nombre || '', x+3, rowY+34);
-        doc.setFont('helvetica','normal');
-        doc.setFontSize(7);
-        doc.setTextColor(136,136,136);
-        const dl = doc.splitTextToSize(p.descripcion || '', cardW-6);
-        doc.text(dl[0]||'', x+3, rowY+40);
-        if (p.precio) {
-          doc.setFont('helvetica','bold');
-          doc.setFontSize(9);
-          doc.setTextColor(255,255,255);
-          doc.text('$'+p.precio, x+3, rowY+48);
-        }
-      } else {
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(9);
-        doc.setTextColor(255,255,255);
-        doc.text(p.nombre || '', x+4, rowY+8);
-        doc.setFont('helvetica','normal');
-        doc.setFontSize(7);
-        doc.setTextColor(136,136,136);
-        const dl = doc.splitTextToSize(p.descripcion || '', cardW-30);
-        doc.text(dl[0]||'', x+4, rowY+14);
-        if (p.precio) {
-          doc.setFont('helvetica','bold');
-          doc.setFontSize(9);
-          doc.setTextColor(255,255,255);
-          doc.text('$'+p.precio, x+cardW-4, rowY+8, { align:'right' });
-        }
       }
 
-      col++;
-      if (col >= cols) { col = 0; rowY += cardH + 6; }
-    });
+      const textW = W - margin - textX - 30;
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255,255,255);
+      doc.text(p.nombre || '', textX, y+9);
 
-    if (col > 0) rowY += (cat.productos[cat.productos.length-1] ? 52 : 24) + 6;
-    y = rowY;
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(136,136,136);
+      const dl = doc.splitTextToSize(p.descripcion || '', textW);
+      doc.text(dl.slice(0,2), textX, y+15);
+
+      if (p.precio) {
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(10);
+        doc.setTextColor(255,255,255);
+        doc.text('$'+p.precio, W-margin-4, y+22, { align:'right' });
+      }
+
+      y += cardH + 4;
+    });
     y += 4;
   });
 
@@ -490,7 +517,7 @@ function descargarPDF() {
   doc.setFontSize(8);
   doc.setTextColor(50,50,50);
   doc.text('Generado con CatalogAI', margin, 290);
-  doc.text(new Date().toLocaleDateString('es-CO'), W-margin, 290, { align: 'right' });
+  doc.text(new Date().toLocaleDateString('es-CO'), W-margin, 290, { align:'right' });
 
   doc.save(empresa.replace(/\s+/g,'-') + '-catalogo.pdf');
   toast('PDF descargado');
