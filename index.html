@@ -277,6 +277,14 @@ function renderTabla() {
   `).join('');
 }
 
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+
 function escHtml(str) {
   return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
@@ -311,14 +319,14 @@ document.getElementById('input-imagenes').addEventListener('change', async funct
   document.getElementById('loading-ia').style.display = 'block';
 
   for (const file of files) {
-    const imgUrl = URL.createObjectURL(file);
+    const base64 = await fileToBase64(file);
     const formData = new FormData();
     formData.append('imagen', file);
     try {
       const res = await fetch(SERVER + '/analizar-imagen', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.ok) {
-        agregarProducto(data.producto.nombre, data.producto.categoria, data.producto.descripcion, '', imgUrl);
+        agregarProducto(data.producto.nombre, data.producto.categoria, data.producto.descripcion, '', base64);
       }
     } catch(e) { console.error(e); }
   }
@@ -410,27 +418,71 @@ function descargarPDF() {
     doc.text(cat.nombre.toUpperCase(), margin, y);
     y += 6;
 
+    const cols = 2;
+    const cardW = (W - margin*2 - 8) / cols;
+    let col = 0;
+    let rowY = y;
+
     (cat.productos || []).forEach(p => {
-      if (y > 270) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
-      doc.setFillColor(20,20,20);
-      doc.roundedRect(margin, y, W-margin*2, 18, 3, 3, 'F');
-      doc.setFont('helvetica','bold');
-      doc.setFontSize(10);
-      doc.setTextColor(255,255,255);
-      doc.text(p.nombre || '', margin+4, y+7);
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(8);
-      doc.setTextColor(136,136,136);
-      const dl = doc.splitTextToSize(p.descripcion || '', W-margin*2-60);
-      doc.text(dl[0] || '', margin+4, y+13);
-      if (p.precio) {
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(10);
-        doc.setTextColor(255,255,255);
-        doc.text('$'+p.precio, W-margin-4, y+10, { align: 'right' });
+      const prod = productos.find(x => x.nombre && p.nombre && x.nombre.toLowerCase().includes(p.nombre.toLowerCase().substring(0,6)));
+      const hasImg = prod && prod.imgUrl && prod.imgUrl.startsWith('data:');
+      const cardH = hasImg ? 52 : 24;
+
+      if (rowY + cardH > 275) {
+        doc.addPage();
+        doc.setFillColor(10,10,10);
+        doc.rect(0,0,W,297,'F');
+        rowY = 20; col = 0;
       }
-      y += 22;
+
+      const x = margin + col * (cardW + 8);
+
+      doc.setFillColor(20,20,20);
+      doc.roundedRect(x, rowY, cardW, cardH, 3, 3, 'F');
+
+      if (hasImg) {
+        try {
+          doc.addImage(prod.imgUrl, 'JPEG', x+2, rowY+2, cardW-4, 28, '', 'FAST');
+        } catch(e) {}
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(8);
+        doc.setTextColor(255,255,255);
+        doc.text(p.nombre || '', x+3, rowY+34);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(7);
+        doc.setTextColor(136,136,136);
+        const dl = doc.splitTextToSize(p.descripcion || '', cardW-6);
+        doc.text(dl[0]||'', x+3, rowY+40);
+        if (p.precio) {
+          doc.setFont('helvetica','bold');
+          doc.setFontSize(9);
+          doc.setTextColor(255,255,255);
+          doc.text('$'+p.precio, x+3, rowY+48);
+        }
+      } else {
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(9);
+        doc.setTextColor(255,255,255);
+        doc.text(p.nombre || '', x+4, rowY+8);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(7);
+        doc.setTextColor(136,136,136);
+        const dl = doc.splitTextToSize(p.descripcion || '', cardW-30);
+        doc.text(dl[0]||'', x+4, rowY+14);
+        if (p.precio) {
+          doc.setFont('helvetica','bold');
+          doc.setFontSize(9);
+          doc.setTextColor(255,255,255);
+          doc.text('$'+p.precio, x+cardW-4, rowY+8, { align:'right' });
+        }
+      }
+
+      col++;
+      if (col >= cols) { col = 0; rowY += cardH + 6; }
     });
+
+    if (col > 0) rowY += (cat.productos[cat.productos.length-1] ? 52 : 24) + 6;
+    y = rowY;
     y += 4;
   });
 
