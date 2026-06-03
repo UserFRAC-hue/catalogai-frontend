@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CatalogAI</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,22 +37,17 @@
 
   .upload-zone { border: 1px dashed #222; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: #0D0D0D; }
   .upload-zone:hover { border-color: #444; }
-  .upload-zone.dragover { border-color: #fff; background: #141414; }
   .upload-icon-wrap { width: 36px; height: 36px; border-radius: 50%; background: #1a1a1a; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
   .upload-icon-wrap i { font-size: 15px; color: #666; }
   .upload-zone p { font-size: 12px; color: #888; }
   .upload-zone span { font-size: 10px; color: #444; display: block; margin-top: 4px; }
   .tags { display: flex; gap: 5px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
-  .tag { font-size: 9px; padding: 3px 8px; border-radius: 6px; background: #0A0A0A; border: 1px solid #222; color: #555; font-weight: 600; letter-spacing: 0.5px; }
+  .tag { font-size: 9px; padding: 3px 8px; border-radius: 6px; background: #0A0A0A; border: 1px solid #222; color: #555; font-weight: 600; }
   .ai-note { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; padding: 5px 10px; border-radius: 20px; background: #0D0D0D; border: 1px solid #1e1e1e; color: #555; margin-top: 10px; }
-  .ai-note i { font-size: 11px; color: #666; }
 
-  .file-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-  .file-item { display: flex; align-items: center; gap: 8px; background: #0A0A0A; border: 1px solid #1e1e1e; border-radius: 8px; padding: 7px 10px; }
+  .file-item { display: flex; align-items: center; gap: 8px; background: #0A0A0A; border: 1px solid #1e1e1e; border-radius: 8px; padding: 7px 10px; margin-top: 8px; }
   .file-item i { font-size: 13px; color: #555; }
   .file-item span { font-size: 11px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .file-item .remove { font-size: 11px; color: #333; cursor: pointer; transition: color 0.15s; }
-  .file-item .remove:hover { color: #888; }
 
   .style-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.75rem; }
   .style-btn { background: #141414; border: 1px solid #222; border-radius: 14px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.2s; }
@@ -69,42 +65,38 @@
   .gen-btn { width: 100%; padding: 1rem; border-radius: 14px; border: 1px solid #fff; background: #fff; color: #0A0A0A; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
   .gen-btn:hover { background: #e8e8e8; }
   .gen-btn:disabled { background: #222; border-color: #333; color: #555; cursor: not-allowed; }
-  .gen-btn i { font-size: 16px; }
 
-  .status-bar { display: flex; gap: 18px; margin-top: 14px; }
-  .s-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #333; }
-  .dot { width: 5px; height: 5px; border-radius: 50%; background: #222; flex-shrink: 0; }
-  .dot.on { background: #fff; }
-
-  .productos-tabla { margin-top: 1rem; }
-  .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 40px; gap: 8px; padding: 8px 12px; background: #0A0A0A; border-radius: 8px; margin-bottom: 6px; }
+  .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 36px; gap: 8px; padding: 8px 12px; background: #0A0A0A; border-radius: 8px; margin-bottom: 6px; }
   .tabla-header span { font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .tabla-row { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 40px; gap: 8px; padding: 8px 12px; background: #141414; border: 1px solid #1e1e1e; border-radius: 8px; margin-bottom: 5px; align-items: center; }
-  .tabla-row input { background: transparent; border: none; color: #ccc; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; width: 100%; padding: 0; }
+  .tabla-row { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 36px; gap: 8px; padding: 8px 12px; background: #141414; border: 1px solid #1e1e1e; border-radius: 8px; margin-bottom: 5px; align-items: center; }
+  .tabla-row input { background: transparent; border: none; color: #ccc; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; width: 100%; }
   .tabla-row input:focus { color: #fff; }
-  .del-btn { background: none; border: none; color: #333; cursor: pointer; font-size: 14px; transition: color 0.15s; display: flex; align-items: center; }
+  .del-btn { background: none; border: none; color: #333; cursor: pointer; font-size: 14px; transition: color 0.15s; display: flex; align-items: center; justify-content: center; }
   .del-btn:hover { color: #888; }
 
-  .loading { display: none; text-align: center; padding: 2rem; }
-  .loading p { font-size: 12px; color: #555; margin-top: 10px; }
-  .spinner { width: 24px; height: 24px; border: 2px solid #222; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+  .spinner { width: 22px; height: 22px; border: 2px solid #222; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .resultado { display: none; margin-top: 1.75rem; }
   .resultado-card { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 1.5rem; }
-  .resultado-titulo { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .resultado-titulo { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
   .resultado-desc { font-size: 12px; color: #888; margin-bottom: 1.5rem; line-height: 1.6; }
-  .categoria-titulo { font-size: 11px; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1e1e1e; }
-  .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .categoria-titulo { font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1e1e1e; }
+  .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
   .producto-card { background: #0D0D0D; border: 1px solid #1e1e1e; border-radius: 12px; padding: 1rem; }
-  .producto-nombre { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-  .producto-desc { font-size: 11px; color: #666; line-height: 1.5; margin-bottom: 8px; }
-  .producto-precio { font-size: 13px; font-weight: 700; color: #fff; }
+  .producto-nombre { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .producto-desc { font-size: 11px; color: #555; line-height: 1.5; margin-bottom: 8px; }
+  .producto-precio { font-size: 14px; font-weight: 700; color: #fff; }
 
   .download-btn { width: 100%; padding: 0.9rem; border-radius: 12px; border: 1px solid #333; background: #0A0A0A; color: #888; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-top: 1rem; }
   .download-btn:hover { border-color: #fff; color: #fff; }
 
+  .status-bar { display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
+  .s-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #333; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: #222; flex-shrink: 0; }
+  .dot.on { background: #fff; }
   input[type=file] { display: none; }
+  .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #fff; color: #0A0A0A; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-weight: 600; display: none; z-index: 999; }
 </style>
 </head>
 <body>
@@ -146,33 +138,29 @@
       <span>Archivo de productos</span>
       <div class="icon-circle"><i class="ti ti-file-spreadsheet"></i></div>
     </div>
-    <div class="upload-zone" id="zone-archivo" onclick="document.getElementById('input-archivo').click()">
+    <div class="upload-zone" onclick="document.getElementById('input-archivo').click()">
       <div class="upload-icon-wrap"><i class="ti ti-upload"></i></div>
       <p>Sube tu archivo con productos</p>
       <span>Arrastra o haz clic aquí</span>
-      <div class="tags">
-        <span class="tag">XLSX</span><span class="tag">PDF</span><span class="tag">WORD</span><span class="tag">CSV</span>
-      </div>
+      <div class="tags"><span class="tag">PDF</span><span class="tag">XLSX</span><span class="tag">WORD</span><span class="tag">CSV</span></div>
     </div>
-    <input type="file" id="input-archivo" accept=".xlsx,.pdf,.docx,.csv">
-    <div class="file-list" id="list-archivo"></div>
+    <input type="file" id="input-archivo" accept=".pdf,.xlsx,.docx,.csv">
+    <div id="info-archivo"></div>
   </div>
   <div class="card">
     <div class="card-header">
       <span>Imágenes de productos</span>
       <div class="icon-circle"><i class="ti ti-photo"></i></div>
     </div>
-    <div class="upload-zone" id="zone-imagenes" onclick="document.getElementById('input-imagenes').click()">
+    <div class="upload-zone" onclick="document.getElementById('input-imagenes').click()">
       <div class="upload-icon-wrap"><i class="ti ti-photo-plus"></i></div>
       <p>Sube las fotos de tus productos</p>
       <span>JPG, PNG, WEBP — múltiples</span>
-      <div class="tags">
-        <span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WEBP</span>
-      </div>
+      <div class="tags"><span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WEBP</span></div>
     </div>
     <input type="file" id="input-imagenes" accept="image/*" multiple>
     <div style="text-align:center"><span class="ai-note"><i class="ti ti-cpu"></i> IA clasifica automáticamente</span></div>
-    <div class="file-list" id="list-imagenes"></div>
+    <div id="info-imagenes"></div>
   </div>
 </div>
 
@@ -181,15 +169,15 @@
 <div class="card" style="margin-bottom:1.75rem">
   <div class="card-header">
     <span>Lista de productos</span>
-    <button onclick="agregarProducto()" style="background:#141414;border:1px solid #222;border-radius:8px;padding:5px 12px;color:#888;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">+ Agregar</button>
+    <button onclick="agregarProducto()" style="background:#0A0A0A;border:1px solid #222;border-radius:8px;padding:5px 12px;color:#888;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">+ Agregar</button>
   </div>
   <div class="tabla-header">
     <span>Nombre</span><span>Categoría</span><span>Descripción</span><span>Precio</span><span></span>
   </div>
   <div id="tabla-productos"></div>
-  <div id="loading-imagenes" style="display:none;text-align:center;padding:1rem;">
+  <div id="loading-ia" style="display:none;text-align:center;padding:1.2rem">
     <div class="spinner"></div>
-    <p style="font-size:11px;color:#555;margin-top:8px">Analizando imágenes con IA...</p>
+    <p style="font-size:11px;color:#555">Analizando con IA...</p>
   </div>
 </div>
 
@@ -214,41 +202,51 @@
   <i class="ti ti-sparkles"></i> Generar catálogo con IA
 </button>
 
-<div class="loading" id="loading-catalogo">
+<div id="loading-catalogo" style="display:none;text-align:center;padding:2rem">
   <div class="spinner"></div>
-  <p>Generando tu catálogo con IA...</p>
+  <p style="font-size:12px;color:#555;margin-top:6px">Generando tu catálogo con IA...</p>
 </div>
 
 <div class="resultado" id="resultado">
   <div class="section-label" style="margin-top:1.75rem">Catálogo generado</div>
   <div class="resultado-card" id="resultado-contenido"></div>
   <button class="download-btn" onclick="descargarPDF()">
-    <i class="ti ti-download"></i> Descargar catálogo
+    <i class="ti ti-download"></i> Descargar PDF
   </button>
 </div>
 
 <div class="status-bar">
   <div class="s-item"><div class="dot on"></div>IA conectada</div>
   <div class="s-item"><div class="dot on"></div>Backend activo</div>
-  <div class="s-item" id="status-archivo"><div class="dot"></div>Archivo pendiente</div>
-  <div class="s-item" id="status-imagenes"><div class="dot"></div>Imágenes pendientes</div>
+  <div class="s-item" id="st-archivo"><div class="dot"></div>Archivo pendiente</div>
+  <div class="s-item" id="st-imagenes"><div class="dot"></div>Imágenes pendientes</div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const SERVER = 'https://catalogai-server.onrender.com';
 let productos = [];
 let estiloSeleccionado = 'Moderno';
 let catalogoData = null;
+let imagenesMap = {};
 
-function selStyle(el, estilo) {
-  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  estiloSeleccionado = estilo;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
 }
 
-function agregarProducto(nombre='', categoria='', descripcion='', precio='') {
+function selStyle(el, e) {
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  estiloSeleccionado = e;
+}
+
+function agregarProducto(nombre, categoria, descripcion, precio, imgUrl) {
   const id = Date.now() + Math.random();
-  productos.push({ id, nombre, categoria, descripcion, precio });
+  productos.push({ id, nombre: nombre||'', categoria: categoria||'', descripcion: descripcion||'', precio: precio||'', imgUrl: imgUrl||'' });
   renderTabla();
 }
 
@@ -257,75 +255,84 @@ function eliminarProducto(id) {
   renderTabla();
 }
 
-function renderTabla() {
-  const cont = document.getElementById('tabla-productos');
-  cont.innerHTML = productos.map(p => `
-    <div class="tabla-row">
-      <input value="${p.nombre}" placeholder="Nombre" onchange="actualizarProducto(${p.id},'nombre',this.value)">
-      <input value="${p.categoria}" placeholder="Categoría" onchange="actualizarProducto(${p.id},'categoria',this.value)">
-      <input value="${p.descripcion}" placeholder="Descripción" onchange="actualizarProducto(${p.id},'descripcion',this.value)">
-      <input value="${p.precio}" placeholder="$0" onchange="actualizarProducto(${p.id},'precio',this.value)">
-      <button class="del-btn" onclick="eliminarProducto(${p.id})"><i class="ti ti-x"></i></button>
-    </div>
-  `).join('');
-}
-
 function actualizarProducto(id, campo, valor) {
   const p = productos.find(x => x.id === id);
   if (p) p[campo] = valor;
 }
 
+function renderTabla() {
+  const cont = document.getElementById('tabla-productos');
+  if (!productos.length) {
+    cont.innerHTML = '<p style="font-size:11px;color:#333;text-align:center;padding:1rem">Sin productos aún. Sube un archivo o imágenes.</p>';
+    return;
+  }
+  cont.innerHTML = productos.map(p => `
+    <div class="tabla-row">
+      <input value="${escHtml(p.nombre)}" placeholder="Nombre" onchange="actualizarProducto(${p.id},'nombre',this.value)">
+      <input value="${escHtml(p.categoria)}" placeholder="Categoría" onchange="actualizarProducto(${p.id},'categoria',this.value)">
+      <input value="${escHtml(p.descripcion)}" placeholder="Descripción" onchange="actualizarProducto(${p.id},'descripcion',this.value)">
+      <input value="${escHtml(p.precio)}" placeholder="0.00" onchange="actualizarProducto(${p.id},'precio',this.value)">
+      <button class="del-btn" onclick="eliminarProducto(${p.id})"><i class="ti ti-x"></i></button>
+    </div>
+  `).join('');
+}
+
+function escHtml(str) {
+  return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('input-archivo').addEventListener('change', async function() {
+  const file = this.files[0];
+  if (!file) return;
+  document.getElementById('info-archivo').innerHTML = `<div class="file-item"><i class="ti ti-file"></i><span>${file.name}</span></div>`;
+  document.getElementById('st-archivo').innerHTML = '<div class="dot on"></div>Archivo cargado';
+
+  if (file.name.endsWith('.pdf')) {
+    document.getElementById('loading-ia').style.display = 'block';
+    const formData = new FormData();
+    formData.append('archivo', file);
+    try {
+      const res = await fetch(SERVER + '/leer-pdf', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.ok && data.productos.length) {
+        data.productos.forEach(p => agregarProducto(p.nombre, p.categoria, p.descripcion, p.precio));
+        toast(data.productos.length + ' productos extraídos del PDF');
+      }
+    } catch(e) { toast('Error leyendo PDF'); }
+    document.getElementById('loading-ia').style.display = 'none';
+  }
+});
+
 document.getElementById('input-imagenes').addEventListener('change', async function() {
   const files = Array.from(this.files);
   if (!files.length) return;
-
-  const listEl = document.getElementById('list-imagenes');
-  listEl.innerHTML = files.map(f => `
-    <div class="file-item">
-      <i class="ti ti-photo"></i>
-      <span>${f.name}</span>
-    </div>
-  `).join('');
-
-  document.getElementById('status-imagenes').innerHTML = '<div class="dot on"></div>Imágenes cargadas';
-  document.getElementById('loading-imagenes').style.display = 'block';
+  document.getElementById('st-imagenes').innerHTML = '<div class="dot on"></div>Imágenes cargadas';
+  document.getElementById('info-imagenes').innerHTML = files.map(f => `<div class="file-item"><i class="ti ti-photo"></i><span>${f.name}</span></div>`).join('');
+  document.getElementById('loading-ia').style.display = 'block';
 
   for (const file of files) {
+    const imgUrl = URL.createObjectURL(file);
     const formData = new FormData();
     formData.append('imagen', file);
     try {
       const res = await fetch(SERVER + '/analizar-imagen', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.ok) {
-        agregarProducto(data.producto.nombre, data.producto.categoria, data.producto.descripcion, '');
+        agregarProducto(data.producto.nombre, data.producto.categoria, data.producto.descripcion, '', imgUrl);
       }
-    } catch (e) {
-      console.error('Error analizando imagen:', e);
-    }
+    } catch(e) { console.error(e); }
   }
 
-  document.getElementById('loading-imagenes').style.display = 'none';
-});
-
-document.getElementById('input-archivo').addEventListener('change', function() {
-  const file = this.files[0];
-  if (!file) return;
-  document.getElementById('list-archivo').innerHTML = `
-    <div class="file-item">
-      <i class="ti ti-file"></i>
-      <span>${file.name}</span>
-    </div>
-  `;
-  document.getElementById('status-archivo').innerHTML = '<div class="dot on"></div>Archivo cargado';
+  document.getElementById('loading-ia').style.display = 'none';
+  toast(files.length + ' imágenes analizadas');
 });
 
 async function generarCatalogo() {
   const empresa = document.getElementById('empresa').value.trim();
   const categoria = document.getElementById('categoria').value;
-
-  if (!empresa) { alert('Ingresa el nombre de la empresa'); return; }
-  if (!categoria) { alert('Selecciona una categoría'); return; }
-  if (!productos.length) { alert('Agrega al menos un producto'); return; }
+  if (!empresa) { toast('Ingresa el nombre de la empresa'); return; }
+  if (!categoria) { toast('Selecciona una categoría'); return; }
+  if (!productos.length) { toast('Agrega al menos un producto'); return; }
 
   document.getElementById('btn-generar').disabled = true;
   document.getElementById('loading-catalogo').style.display = 'block';
@@ -342,49 +349,99 @@ async function generarCatalogo() {
       catalogoData = data.catalogo;
       mostrarResultado(data.catalogo);
     }
-  } catch (e) {
-    alert('Error generando catálogo: ' + e.message);
-  }
+  } catch(e) { toast('Error: ' + e.message); }
 
   document.getElementById('btn-generar').disabled = false;
   document.getElementById('loading-catalogo').style.display = 'none';
 }
 
-function mostrarResultado(catalogo) {
+function mostrarResultado(cat) {
   const cont = document.getElementById('resultado-contenido');
-  const cats = (catalogo.categorias || []).map(cat => `
+  const cats = (cat.categorias||[]).map(c => `
     <div style="margin-bottom:1.5rem">
-      <div class="categoria-titulo">${cat.nombre}</div>
+      <div class="categoria-titulo">${c.nombre}</div>
       <div class="productos-grid">
-        ${(cat.productos || []).map(p => `
-          <div class="producto-card">
-            <div class="producto-nombre">${p.nombre}</div>
-            <div class="producto-desc">${p.descripcion}</div>
-            ${p.precio ? '<div class="producto-precio">$' + p.precio + '</div>' : ''}
-          </div>
-        `).join('')}
+        ${(c.productos||[]).map(p => {
+          const prod = productos.find(x => x.nombre.toLowerCase().includes((p.nombre||'').toLowerCase().substring(0,8)));
+          const img = prod && prod.imgUrl ? `<img src="${prod.imgUrl}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px">` : '';
+          return `<div class="producto-card">${img}<div class="producto-nombre">${p.nombre}</div><div class="producto-desc">${p.descripcion}</div>${p.precio?'<div class="producto-precio">$'+p.precio+'</div>':''}</div>`;
+        }).join('')}
       </div>
     </div>
   `).join('');
-
-  cont.innerHTML = `
-    <div class="resultado-titulo">${catalogo.titulo}</div>
-    <div class="resultado-desc">${catalogo.descripcion}</div>
-    ${cats}
-  `;
+  cont.innerHTML = `<div class="resultado-titulo">${cat.titulo}</div><div class="resultado-desc">${cat.descripcion}</div>${cats}`;
   document.getElementById('resultado').style.display = 'block';
 }
 
 function descargarPDF() {
   if (!catalogoData) return;
-  const empresa = document.getElementById('empresa').value || 'catalogo';
-  const contenido = document.getElementById('resultado-contenido').innerText;
-  const blob = new Blob([contenido], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = empresa + '-catalogo.txt';
-  a.click();
-  URL.revokeObjectURL(url);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+  const empresa = document.getElementById('empresa').value || 'Catalogo';
+  const W = 210, margin = 16;
+  let y = 20;
+
+  doc.setFillColor(10,10,10);
+  doc.rect(0,0,W,297,'F');
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(255,255,255);
+  doc.text(catalogoData.titulo || empresa, margin, y);
+  y += 8;
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(136,136,136);
+  const desc = doc.splitTextToSize(catalogoData.descripcion || '', W - margin*2);
+  doc.text(desc, margin, y);
+  y += desc.length * 5 + 8;
+
+  doc.setDrawColor(30,30,30);
+  doc.line(margin, y, W-margin, y);
+  y += 8;
+
+  (catalogoData.categorias || []).forEach(cat => {
+    if (y > 260) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
+
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(255,255,255);
+    doc.text(cat.nombre.toUpperCase(), margin, y);
+    y += 6;
+
+    (cat.productos || []).forEach(p => {
+      if (y > 270) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
+      doc.setFillColor(20,20,20);
+      doc.roundedRect(margin, y, W-margin*2, 18, 3, 3, 'F');
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(10);
+      doc.setTextColor(255,255,255);
+      doc.text(p.nombre || '', margin+4, y+7);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      doc.setTextColor(136,136,136);
+      const dl = doc.splitTextToSize(p.descripcion || '', W-margin*2-60);
+      doc.text(dl[0] || '', margin+4, y+13);
+      if (p.precio) {
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(10);
+        doc.setTextColor(255,255,255);
+        doc.text('$'+p.precio, W-margin-4, y+10, { align: 'right' });
+      }
+      y += 22;
+    });
+    y += 4;
+  });
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(50,50,50);
+  doc.text('Generado con CatalogAI', margin, 290);
+  doc.text(new Date().toLocaleDateString('es-CO'), W-margin, 290, { align: 'right' });
+
+  doc.save(empresa.replace(/\s+/g,'-') + '-catalogo.pdf');
+  toast('PDF descargado');
 }
 </script>
 </body>
