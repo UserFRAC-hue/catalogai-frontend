@@ -7,109 +7,136 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: #0A0A0A; color: #fff; min-height: 100vh; padding: 2rem 1.75rem; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#fff;min-height:100vh;padding:2rem 1.75rem}
+.header{display:flex;align-items:center;gap:14px;margin-bottom:2.5rem;padding-bottom:1.25rem;border-bottom:1px solid #1a1a1a}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:#141414;border:1px solid #262626;display:flex;align-items:center;justify-content:center}
+.logo-mark i{font-size:16px;color:#888}
+.header-text h1{font-size:15px;font-weight:600;color:#fff}
+.header-text p{font-size:11px;color:#888;margin-top:2px}
+.pill{margin-left:auto;font-size:10px;padding:4px 10px;border-radius:20px;background:#141414;border:1px solid #262626;color:#888;font-weight:500;display:flex;align-items:center;gap:5px}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:#fff}
+.section-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#444;font-weight:600;margin-bottom:12px}
+.divider{height:1px;background:#141414;margin:1.75rem 0}
+.field-label{font-size:10px;color:#888;margin-bottom:6px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
+input[type=text],select{width:100%;background:#141414;border:1px solid #222;border-radius:12px;padding:11px 14px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none}
+input[type=text]::placeholder{color:#444}
+input[type=text]:focus,select:focus{border-color:#444}
+select{color:#888}
+select option{background:#141414;color:#fff}
+input[type=file]{display:none}
 
-  .header { display: flex; align-items: center; gap: 14px; margin-bottom: 2.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #1a1a1a; }
-  .logo-mark { width: 36px; height: 36px; border-radius: 10px; background: #141414; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; }
-  .logo-mark i { font-size: 16px; color: #888; }
-  .header-text h1 { font-size: 15px; font-weight: 600; color: #fff; }
-  .header-text p { font-size: 11px; color: #888; margin-top: 2px; }
-  .pill { margin-left: auto; font-size: 10px; padding: 4px 10px; border-radius: 20px; background: #141414; border: 1px solid #262626; color: #888; font-weight: 500; display: flex; align-items: center; gap: 5px; }
-  .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: #fff; }
+/* MODO TABS */
+.modo-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.75rem}
+.modo-tab{background:#141414;border:1px solid #222;border-radius:14px;padding:1.25rem;cursor:pointer;transition:all .2s;text-align:left}
+.modo-tab:hover{border-color:#333}
+.modo-tab.active{border-color:#fff;background:#161616}
+.modo-tab-icon{width:36px;height:36px;border-radius:50%;background:#0D0D0D;border:1px solid #222;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.modo-tab-icon i{font-size:17px;color:#444}
+.modo-tab.active .modo-tab-icon{border-color:#555}
+.modo-tab.active .modo-tab-icon i{color:#fff}
+.modo-tab strong{font-size:13px;color:#555;display:block;font-weight:600}
+.modo-tab p{font-size:11px;color:#333;margin-top:4px;line-height:1.5}
+.modo-tab.active strong{color:#fff}
+.modo-tab.active p{color:#888}
 
-  .section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #444; font-weight: 600; margin-bottom: 12px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.75rem; }
-  .field-label { font-size: 10px; color: #888; margin-bottom: 6px; font-weight: 500; letter-spacing: 0.3px; text-transform: uppercase; }
-  input[type=text], select { width: 100%; background: #141414; border: 1px solid #222; border-radius: 12px; padding: 11px 14px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-  input[type=text]::placeholder { color: #444; }
-  input[type=text]:focus, select:focus { border-color: #444; }
-  select { color: #888; }
+.panel{display:none}
+.panel.active{display:block}
 
-  .divider { height: 1px; background: #141414; margin: 1.75rem 0; }
-  .cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.75rem; }
-  .card { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 1.25rem; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .card-header span { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
-  .icon-circle { width: 28px; height: 28px; border-radius: 50%; background: #0A0A0A; border: 1px solid #222; display: flex; align-items: center; justify-content: center; }
-  .icon-circle i { font-size: 13px; color: #555; }
+/* CARDS */
+.card{background:#141414;border:1px solid #222;border-radius:16px;padding:1.25rem}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-header span{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.icon-circle{width:28px;height:28px;border-radius:50%;background:#0A0A0A;border:1px solid #222;display:flex;align-items:center;justify-content:center}
+.icon-circle i{font-size:13px;color:#555}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.75rem}
+.upload-zone{border:1px dashed #222;border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all .2s;background:#0D0D0D}
+.upload-zone:hover{border-color:#444}
+.upload-icon-wrap{width:36px;height:36px;border-radius:50%;background:#1a1a1a;border:1px solid #262626;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.upload-icon-wrap i{font-size:15px;color:#666}
+.upload-zone p{font-size:12px;color:#888}
+.upload-zone span{font-size:10px;color:#444;display:block;margin-top:4px}
+.tags{display:flex;gap:5px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.tag{font-size:9px;padding:3px 8px;border-radius:6px;background:#0A0A0A;border:1px solid #222;color:#555;font-weight:600}
 
-  .upload-zone { border: 1px dashed #222; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: #0D0D0D; }
-  .upload-zone:hover { border-color: #444; }
-  .upload-icon-wrap { width: 36px; height: 36px; border-radius: 50%; background: #1a1a1a; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-  .upload-icon-wrap i { font-size: 15px; color: #666; }
-  .upload-zone p { font-size: 12px; color: #888; }
-  .upload-zone span { font-size: 10px; color: #444; display: block; margin-top: 4px; }
-  .tags { display: flex; gap: 5px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
-  .tag { font-size: 9px; padding: 3px 8px; border-radius: 6px; background: #0A0A0A; border: 1px solid #222; color: #555; font-weight: 600; }
-  .ai-note { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; padding: 5px 10px; border-radius: 20px; background: #0D0D0D; border: 1px solid #1e1e1e; color: #555; margin-top: 10px; }
+/* GALERIA MODO 1 */
+.img-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
+.img-thumb-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #222;background:#141414;aspect-ratio:1}
+.img-thumb-wrap img{width:100%;height:100%;object-fit:cover}
+.img-thumb-wrap .img-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);padding:5px 6px}
+.img-label input{background:transparent;border:none;color:#fff;font-size:10px;font-family:'Inter',sans-serif;outline:none;width:100%;font-weight:500}
+.img-thumb-wrap .remove-img{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+.img-thumb-wrap .remove-img:hover{color:#fff}
+.cat-badge{position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.75);border-radius:4px;padding:2px 6px;font-size:9px;color:#aaa;font-weight:500}
 
-  .file-item { display: flex; align-items: center; gap: 8px; background: #0A0A0A; border: 1px solid #1e1e1e; border-radius: 8px; padding: 7px 10px; margin-top: 8px; }
-  .file-item i { font-size: 13px; color: #555; }
-  .file-item span { font-size: 11px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* MODO 2 - TABLA */
+.tabla-header{display:grid;grid-template-columns:32px 2fr 1fr 2fr 1fr 36px;gap:8px;padding:8px 12px;background:#0A0A0A;border-radius:8px;margin-bottom:6px}
+.tabla-header span{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.tabla-row{display:grid;grid-template-columns:32px 2fr 1fr 2fr 1fr 36px;gap:8px;padding:8px 12px;background:#141414;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:5px;align-items:center}
+.tabla-row input{background:transparent;border:none;color:#ccc;font-size:12px;font-family:'Inter',sans-serif;outline:none;width:100%}
+.tabla-row input:focus{color:#fff}
+.del-btn{background:none;border:none;color:#333;cursor:pointer;font-size:14px;transition:color .15s;display:flex;align-items:center;justify-content:center}
+.del-btn:hover{color:#888}
+.img-slot{width:32px;height:32px;border-radius:6px;border:1px dashed #333;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:border-color .15s;flex-shrink:0}
+.img-slot:hover{border-color:#666}
+.img-slot img{width:100%;height:100%;object-fit:cover}
+.img-slot i{font-size:14px;color:#333}
 
-  .style-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.75rem; }
-  .style-btn { background: #141414; border: 1px solid #222; border-radius: 14px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .style-btn:hover { border-color: #333; }
-  .style-btn.active { border-color: #555; background: #161616; }
-  .style-icon { width: 32px; height: 32px; border-radius: 50%; background: #0D0D0D; border: 1px solid #222; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-  .style-icon i { font-size: 15px; color: #444; }
-  .style-btn.active .style-icon { border-color: #444; }
-  .style-btn.active .style-icon i { color: #fff; }
-  .style-btn strong { font-size: 12px; color: #555; display: block; font-weight: 500; }
-  .style-btn p { font-size: 10px; color: #333; margin-top: 3px; }
-  .style-btn.active strong { color: #fff; }
-  .style-btn.active p { color: #888; }
+/* PANEL IMAGENES MODO 2 */
+.img-pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pool-img{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid #222;cursor:grab;transition:all .2s;flex-shrink:0}
+.pool-img:hover{border-color:#888;transform:scale(1.05)}
+.pool-img.used{opacity:0.3;cursor:default}
 
-  .gen-btn { width: 100%; padding: 1rem; border-radius: 14px; border: 1px solid #fff; background: #fff; color: #0A0A0A; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-  .gen-btn:hover { background: #e8e8e8; }
-  .gen-btn:disabled { background: #222; border-color: #333; color: #555; cursor: not-allowed; }
+/* ESTILO */
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.75rem}
+.style-btn{background:#141414;border:1px solid #222;border-radius:14px;padding:1rem .75rem;cursor:pointer;text-align:center;transition:all .2s}
+.style-btn:hover{border-color:#333}
+.style-btn.active{border-color:#555;background:#161616}
+.style-icon{width:32px;height:32px;border-radius:50%;background:#0D0D0D;border:1px solid #222;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.style-icon i{font-size:15px;color:#444}
+.style-btn.active .style-icon{border-color:#444}
+.style-btn.active .style-icon i{color:#fff}
+.style-btn strong{font-size:12px;color:#555;display:block;font-weight:500}
+.style-btn p{font-size:10px;color:#333;margin-top:3px}
+.style-btn.active strong{color:#fff}
+.style-btn.active p{color:#888}
 
-  .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 36px; gap: 8px; padding: 8px 12px; background: #0A0A0A; border-radius: 8px; margin-bottom: 6px; }
-  .tabla-header span { font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .tabla-row { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 36px; gap: 8px; padding: 8px 12px; background: #141414; border: 1px solid #1e1e1e; border-radius: 8px; margin-bottom: 5px; align-items: center; }
-  .tabla-row input { background: transparent; border: none; color: #ccc; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; width: 100%; }
-  .tabla-row input:focus { color: #fff; }
-  .del-btn { background: none; border: none; color: #333; cursor: pointer; font-size: 14px; transition: color 0.15s; display: flex; align-items: center; justify-content: center; }
-  .del-btn:hover { color: #888; }
+.gen-btn{width:100%;padding:1rem;border-radius:14px;border:1px solid #fff;background:#fff;color:#0A0A0A;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.gen-btn:hover{background:#e8e8e8}
+.gen-btn:disabled{background:#222;border-color:#333;color:#555;cursor:not-allowed}
 
-  .spinner { width: 22px; height: 22px; border: 2px solid #222; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 8px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+.download-btn{width:100%;padding:.9rem;border-radius:12px;border:1px solid #333;background:#0A0A0A;color:#888;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:1rem}
+.download-btn:hover{border-color:#fff;color:#fff}
 
-  .resultado { display: none; margin-top: 1.75rem; }
-  .resultado-card { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 1.5rem; }
-  .resultado-titulo { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .resultado-desc { font-size: 12px; color: #888; margin-bottom: 1.5rem; line-height: 1.6; }
-  .categoria-titulo { font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #1e1e1e; }
-  .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-  .producto-card { background: #0D0D0D; border: 1px solid #1e1e1e; border-radius: 12px; padding: 1rem; }
-  .producto-nombre { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-  .producto-desc { font-size: 11px; color: #555; line-height: 1.5; margin-bottom: 8px; }
-  .producto-precio { font-size: 14px; font-weight: 700; color: #fff; }
+.status-bar{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
+.s-item{display:flex;align-items:center;gap:6px;font-size:10px;color:#333}
+.dot{width:5px;height:5px;border-radius:50%;background:#222;flex-shrink:0}
+.dot.on{background:#fff}
 
-  .download-btn { width: 100%; padding: 0.9rem; border-radius: 12px; border: 1px solid #333; background: #0A0A0A; color: #888; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; margin-top: 1rem; }
-  .download-btn:hover { border-color: #fff; color: #fff; }
+.spinner{width:22px;height:22px;border:2px solid #222;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  .status-bar { display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
-  .s-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #333; }
-  .dot { width: 5px; height: 5px; border-radius: 50%; background: #222; flex-shrink: 0; }
-  .dot.on { background: #fff; }
-  input[type=file] { display: none; }
-  .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #fff; color: #0A0A0A; padding: 10px 18px; border-radius: 10px; font-size: 12px; font-weight: 600; display: none; z-index: 999; }
+.resultado{display:none;margin-top:1.75rem}
+.resultado-card{background:#141414;border:1px solid #222;border-radius:16px;padding:1.5rem}
+.resultado-titulo{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.resultado-desc{font-size:12px;color:#888;margin-bottom:1.5rem;line-height:1.6}
+.categoria-titulo{font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1e1e1e}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#fff;color:#0A0A0A;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;display:none;z-index:999}
+.ai-note{display:inline-flex;align-items:center;gap:6px;font-size:10px;padding:5px 10px;border-radius:20px;background:#0D0D0D;border:1px solid #1e1e1e;color:#555;margin-top:10px}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo-mark"><i class="ti ti-layout-grid"></i></div>
-  <div class="header-text">
-    <h1>CatalogAI</h1>
-    <p>Generador inteligente de catálogos en PDF</p>
-  </div>
+  <div class="header-text"><h1>CatalogAI</h1><p>Generador inteligente de catálogos en PDF</p></div>
   <span class="pill"><span class="pill-dot"></span> IA activa</span>
 </div>
 
+<!-- INFO EMPRESA -->
 <div class="section-label">1 — Información del negocio</div>
 <div class="two-col">
   <div>
@@ -120,67 +147,103 @@
     <div class="field-label">Categoría del negocio</div>
     <select id="categoria">
       <option value="" disabled selected>Seleccionar...</option>
-      <option>Ropa y moda</option>
-      <option>Ferretería</option>
-      <option>Tecnología</option>
-      <option>Restaurante</option>
-      <option>Electrodomésticos</option>
-      <option>Otro</option>
+      <option value="ropa">Ropa y moda</option>
+      <option value="restaurante">Restaurante / Comida</option>
+      <option value="ferreteria">Ferretería</option>
+      <option value="tecnologia">Tecnología / Celulares</option>
+      <option value="electrodomesticos">Electrodomésticos</option>
+      <option value="otro">Otro</option>
     </select>
   </div>
 </div>
 
 <div class="divider"></div>
-<div class="section-label">2 — Carga de datos</div>
-<div class="cards-row">
-  <div class="card">
-    <div class="card-header">
-      <span>Archivo de productos</span>
-      <div class="icon-circle"><i class="ti ti-file-spreadsheet"></i></div>
-    </div>
-    <div class="upload-zone" onclick="document.getElementById('input-archivo').click()">
-      <div class="upload-icon-wrap"><i class="ti ti-upload"></i></div>
-      <p>Sube tu archivo con productos</p>
-      <span>Arrastra o haz clic aquí</span>
-      <div class="tags"><span class="tag">PDF</span><span class="tag">XLSX</span><span class="tag">WORD</span><span class="tag">CSV</span></div>
-    </div>
-    <input type="file" id="input-archivo" accept=".pdf,.xlsx,.docx,.csv">
-    <div id="info-archivo"></div>
+
+<!-- MODO SELECTOR -->
+<div class="section-label">2 — Tipo de catálogo</div>
+<div class="modo-tabs">
+  <div class="modo-tab active" onclick="setModo('imagenes')" id="tab-imagenes">
+    <div class="modo-tab-icon"><i class="ti ti-photo"></i></div>
+    <strong>Solo imágenes</strong>
+    <p>Sube fotos y la IA las categoriza. Sin precios ni descripciones.</p>
   </div>
-  <div class="card">
+  <div class="modo-tab" onclick="setModo('completo')" id="tab-completo">
+    <div class="modo-tab-icon"><i class="ti ti-list-details"></i></div>
+    <strong>Catálogo completo</strong>
+    <p>Sube tu Excel o PDF con productos y asigna imágenes manualmente.</p>
+  </div>
+</div>
+
+<!-- PANEL MODO 1: SOLO IMAGENES -->
+<div class="panel active" id="panel-imagenes">
+  <div class="section-label">3 — Imágenes de productos</div>
+  <div class="card" style="margin-bottom:1.75rem">
     <div class="card-header">
-      <span>Imágenes de productos</span>
+      <span>Fotos de productos</span>
       <div class="icon-circle"><i class="ti ti-photo"></i></div>
     </div>
-    <div class="upload-zone" onclick="document.getElementById('input-imagenes').click()">
+    <div class="upload-zone" onclick="document.getElementById('input-imgs1').click()">
       <div class="upload-icon-wrap"><i class="ti ti-photo-plus"></i></div>
-      <p>Sube las fotos de tus productos</p>
-      <span>JPG, PNG, WEBP — múltiples</span>
+      <p>Sube todas las fotos de tus productos</p>
+      <span>JPG, PNG, WEBP — múltiples archivos</span>
       <div class="tags"><span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WEBP</span></div>
     </div>
-    <input type="file" id="input-imagenes" accept="image/*" multiple>
-    <div style="text-align:center"><span class="ai-note"><i class="ti ti-cpu"></i> IA clasifica automáticamente</span></div>
-    <div id="info-imagenes"></div>
+    <input type="file" id="input-imgs1" accept="image/*" multiple>
+    <div style="text-align:center"><span class="ai-note"><i class="ti ti-cpu"></i> La IA detecta y categoriza cada producto automáticamente</span></div>
+    <div id="loading-imgs1" style="display:none;text-align:center;padding:1rem"><div class="spinner"></div><p style="font-size:11px;color:#555">Analizando imágenes con IA...</p></div>
+    <div class="img-gallery" id="gallery1"></div>
   </div>
 </div>
 
-<div class="divider"></div>
-<div class="section-label">3 — Productos detectados</div>
-<div class="card" style="margin-bottom:1.75rem">
-  <div class="card-header">
-    <span>Lista de productos</span>
-    <button onclick="agregarProducto()" style="background:#0A0A0A;border:1px solid #222;border-radius:8px;padding:5px 12px;color:#888;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">+ Agregar</button>
+<!-- PANEL MODO 2: COMPLETO -->
+<div class="panel" id="panel-completo">
+  <div class="section-label">3 — Datos de productos</div>
+  <div class="two-col" style="margin-bottom:1.75rem">
+    <div class="card">
+      <div class="card-header">
+        <span>Archivo de productos</span>
+        <div class="icon-circle"><i class="ti ti-file-spreadsheet"></i></div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('input-archivo').click()">
+        <div class="upload-icon-wrap"><i class="ti ti-upload"></i></div>
+        <p>Sube tu archivo con productos</p>
+        <span>Arrastra o haz clic aquí</span>
+        <div class="tags"><span class="tag">PDF</span><span class="tag">XLSX</span><span class="tag">WORD</span><span class="tag">CSV</span></div>
+      </div>
+      <input type="file" id="input-archivo" accept=".pdf,.xlsx,.docx,.csv">
+      <div id="info-archivo"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span>Imágenes (opcional)</span>
+        <div class="icon-circle"><i class="ti ti-photo"></i></div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('input-imgs2').click()">
+        <div class="upload-icon-wrap"><i class="ti ti-photo-plus"></i></div>
+        <p>Sube fotos para asignarlas manualmente</p>
+        <span>Arrástralas a cada producto</span>
+        <div class="tags"><span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">WEBP</span></div>
+      </div>
+      <input type="file" id="input-imgs2" accept="image/*" multiple>
+      <div class="img-pool" id="pool-imgs"></div>
+    </div>
   </div>
-  <div class="tabla-header">
-    <span>Nombre</span><span>Categoría</span><span>Descripción</span><span>Precio</span><span></span>
-  </div>
-  <div id="tabla-productos"></div>
-  <div id="loading-ia" style="display:none;text-align:center;padding:1.2rem">
-    <div class="spinner"></div>
-    <p style="font-size:11px;color:#555">Analizando con IA...</p>
+
+  <div class="section-label">Productos detectados</div>
+  <div class="card" style="margin-bottom:1.75rem">
+    <div class="card-header">
+      <span>Lista editable de productos</span>
+      <button onclick="agregarProducto()" style="background:#0A0A0A;border:1px solid #222;border-radius:8px;padding:5px 12px;color:#888;font-size:11px;cursor:pointer;font-family:Inter,sans-serif">+ Agregar</button>
+    </div>
+    <div class="tabla-header">
+      <span>Img</span><span>Nombre</span><span>Categoría</span><span>Descripción</span><span>Precio</span><span></span>
+    </div>
+    <div id="tabla-productos"></div>
+    <div id="loading-ia" style="display:none;text-align:center;padding:1rem"><div class="spinner"></div><p style="font-size:11px;color:#555">Extrayendo productos con IA...</p></div>
   </div>
 </div>
 
+<!-- ESTILO -->
 <div class="divider"></div>
 <div class="section-label">4 — Estilo del catálogo</div>
 <div class="style-grid">
@@ -199,7 +262,7 @@
 </div>
 
 <button class="gen-btn" id="btn-generar" onclick="generarCatalogo()">
-  <i class="ti ti-sparkles"></i> Generar catálogo con IA
+  <i class="ti ti-sparkles"></i> Generar catálogo PDF
 </button>
 
 <div id="loading-catalogo" style="display:none;text-align:center;padding:2rem">
@@ -208,66 +271,174 @@
 </div>
 
 <div class="resultado" id="resultado">
-  <div class="section-label" style="margin-top:1.75rem">Catálogo generado</div>
+  <div class="section-label" style="margin-top:1.75rem">Vista previa</div>
   <div class="resultado-card" id="resultado-contenido"></div>
-  <button class="download-btn" onclick="descargarPDF()">
-    <i class="ti ti-download"></i> Descargar PDF
-  </button>
+  <button class="download-btn" onclick="descargarPDF()"><i class="ti ti-download"></i> Descargar PDF</button>
 </div>
 
 <div class="status-bar">
   <div class="s-item"><div class="dot on"></div>IA conectada</div>
   <div class="s-item"><div class="dot on"></div>Backend activo</div>
-  <div class="s-item" id="st-archivo"><div class="dot"></div>Archivo pendiente</div>
-  <div class="s-item" id="st-imagenes"><div class="dot"></div>Imágenes pendientes</div>
+  <div class="s-item" id="st-archivo"><div class="dot"></div>Sin archivo</div>
+  <div class="s-item" id="st-imgs"><div class="dot"></div>Sin imágenes</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const SERVER = 'https://catalogai-server.onrender.com';
-let productos = [];
+let modoActual = 'imagenes';
 let estiloSeleccionado = 'Moderno';
 let catalogoData = null;
-let productosBackup = [];
+let productos = [];
+let imgs1 = []; // modo 1: {base64, nombre, categoria, id}
+let imgs2 = []; // modo 2 pool: {base64, nombre, id, used}
 
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+const PALETAS = {
+  ropa:           { bg:[10,10,10], card:[20,20,20], accent:[255,255,255], texto:[255,255,255], sub:[136,136,136] },
+  restaurante:    { bg:[12,8,4],   card:[22,14,8],  accent:[230,140,40],  texto:[255,245,230], sub:[180,140,100] },
+  ferreteria:     { bg:[8,10,12],  card:[16,20,24], accent:[80,160,220],  texto:[220,235,255], sub:[120,150,180] },
+  tecnologia:     { bg:[8,8,14],   card:[14,14,22], accent:[100,120,255], texto:[220,225,255], sub:[120,130,200] },
+  electrodomesticos:{bg:[10,10,10],card:[18,18,18], accent:[200,200,200], texto:[255,255,255], sub:[150,150,150] },
+  otro:           { bg:[10,10,10], card:[20,20,20], accent:[255,255,255], texto:[255,255,255], sub:[136,136,136] }
+};
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
+
+function setModo(m){
+  modoActual=m;
+  document.getElementById('tab-imagenes').classList.toggle('active', m==='imagenes');
+  document.getElementById('tab-completo').classList.toggle('active', m==='completo');
+  document.getElementById('panel-imagenes').classList.toggle('active', m==='imagenes');
+  document.getElementById('panel-completo').classList.toggle('active', m==='completo');
 }
 
-function selStyle(el, e) {
-  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  estiloSeleccionado = e;
+function selStyle(el,e){
+  document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); estiloSeleccionado=e;
 }
 
-function agregarProducto(nombre, categoria, descripcion, precio, imgUrl) {
-  const id = Date.now() + Math.random();
-  productos.push({ id, nombre: nombre||'', categoria: categoria||'', descripcion: descripcion||'', precio: precio||'', imgUrl: imgUrl||'' });
-  renderTabla();
-}
+function fileToBase64(file){ return new Promise(r=>{ const fr=new FileReader(); fr.onload=e=>r(e.target.result); fr.readAsDataURL(file); }); }
+function escHtml(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function eliminarProducto(id) {
-  productos = productos.filter(p => p.id !== id);
-  renderTabla();
-}
+// ---- MODO 1 ----
+document.getElementById('input-imgs1').addEventListener('change', async function(){
+  const files=Array.from(this.files); if(!files.length) return;
+  document.getElementById('loading-imgs1').style.display='block';
+  document.getElementById('st-imgs').innerHTML='<div class="dot on"></div>Analizando...';
 
-function actualizarProducto(id, campo, valor) {
-  const p = productos.find(x => x.id === id);
-  if (p) p[campo] = valor;
-}
-
-function renderTabla() {
-  const cont = document.getElementById('tabla-productos');
-  if (!productos.length) {
-    cont.innerHTML = '<p style="font-size:11px;color:#333;text-align:center;padding:1rem">Sin productos aún. Sube un archivo o imágenes.</p>';
-    return;
+  for(const file of files){
+    const b64=await fileToBase64(file);
+    const fd=new FormData(); fd.append('imagen',file);
+    try{
+      const res=await fetch(SERVER+'/analizar-imagen',{method:'POST',body:fd});
+      const d=await res.json();
+      if(d.ok){
+        imgs1.push({ id:Date.now()+Math.random(), base64:b64, nombre:d.producto.nombre, categoria:d.producto.categoria });
+      }
+    }catch(e){ imgs1.push({ id:Date.now()+Math.random(), base64:b64, nombre:file.name.replace(/\.[^.]+$/,''), categoria:'General' }); }
   }
-  cont.innerHTML = productos.map(p => `
-    <div class="tabla-row">
+
+  document.getElementById('loading-imgs1').style.display='none';
+  document.getElementById('st-imgs').innerHTML='<div class="dot on"></div>'+imgs1.length+' imágenes';
+  renderGallery1();
+  toast(files.length+' imágenes analizadas');
+});
+
+function renderGallery1(){
+  const g=document.getElementById('gallery1');
+  g.innerHTML=imgs1.map(img=>`
+    <div class="img-thumb-wrap">
+      <img src="${img.base64}">
+      <span class="cat-badge">${escHtml(img.categoria)}</span>
+      <button class="remove-img" onclick="removeImg1('${img.id}')"><i class="ti ti-x"></i></button>
+      <div class="img-label"><input value="${escHtml(img.nombre)}" placeholder="Nombre" onchange="updateImg1('${img.id}','nombre',this.value)"></div>
+    </div>
+  `).join('');
+}
+
+function removeImg1(id){ imgs1=imgs1.filter(x=>x.id!=id); renderGallery1(); }
+function updateImg1(id,campo,val){ const x=imgs1.find(x=>x.id==id); if(x) x[campo]=val; }
+
+// ---- MODO 2 ----
+document.getElementById('input-archivo').addEventListener('change', async function(){
+  const file=this.files[0]; if(!file) return;
+  document.getElementById('info-archivo').innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:#0A0A0A;border:1px solid #1e1e1e;border-radius:8px;padding:7px 10px;margin-top:8px"><i class="ti ti-file" style="font-size:13px;color:#555"></i><span style="font-size:11px;color:#888">${file.name}</span></div>`;
+  document.getElementById('st-archivo').innerHTML='<div class="dot on"></div>Archivo cargado';
+
+  if(file.name.endsWith('.pdf')){
+    document.getElementById('loading-ia').style.display='block';
+    const fd=new FormData(); fd.append('archivo',file);
+    try{
+      const res=await fetch(SERVER+'/leer-pdf',{method:'POST',body:fd});
+      const d=await res.json();
+      if(d.ok && d.productos.length){
+        productos=[];
+        d.productos.forEach(p=>agregarProducto(p.nombre,p.categoria,p.descripcion,p.precio));
+        toast(d.productos.length+' productos extraídos');
+      }
+    }catch(e){ toast('Error leyendo PDF'); }
+    document.getElementById('loading-ia').style.display='none';
+  }
+});
+
+document.getElementById('input-imgs2').addEventListener('change', async function(){
+  const files=Array.from(this.files); if(!files.length) return;
+  for(const file of files){
+    const b64=await fileToBase64(file);
+    imgs2.push({ id:'img'+Date.now()+Math.random(), base64:b64, nombre:file.name.replace(/\.[^.]+$/,''), used:false });
+  }
+  renderPool();
+  toast(files.length+' imágenes cargadas — asígnalas a cada producto');
+});
+
+function renderPool(){
+  const p=document.getElementById('pool-imgs');
+  p.innerHTML=imgs2.map(img=>`<img class="pool-img${img.used?' used':''}" src="${img.base64}" title="${escHtml(img.nombre)}" draggable="true" ondragstart="dragStart(event,'${img.id}')" onclick="clickPoolImg('${img.id}')">`).join('');
+}
+
+let draggedImgId=null;
+function dragStart(e,id){ draggedImgId=id; }
+
+function clickPoolImg(id){
+  const img=imgs2.find(x=>x.id==id); if(!img||img.used) return;
+  toast('Haz clic en el slot 📷 del producto donde quieres asignar esta imagen');
+  draggedImgId=id;
+}
+
+function asignarImgAProducto(prodId){
+  if(!draggedImgId) return;
+  const img=imgs2.find(x=>x.id==draggedImgId); if(!img) return;
+  const prod=productos.find(x=>x.id==prodId); if(!prod) return;
+  if(prod.imgId){ const old=imgs2.find(x=>x.id==prod.imgId); if(old) old.used=false; }
+  prod.imgUrl=img.base64; prod.imgId=img.id; img.used=true;
+  draggedImgId=null;
+  renderTabla(); renderPool();
+  toast('Imagen asignada a '+prod.nombre);
+}
+
+function agregarProducto(nombre,categoria,descripcion,precio){
+  const id=Date.now()+Math.random();
+  productos.push({ id, nombre:nombre||'', categoria:categoria||'', descripcion:descripcion||'', precio:precio||'', imgUrl:'', imgId:null });
+  renderTabla();
+}
+
+function eliminarProducto(id){
+  const p=productos.find(x=>x.id==id);
+  if(p&&p.imgId){ const img=imgs2.find(x=>x.id==p.imgId); if(img) img.used=false; renderPool(); }
+  productos=productos.filter(x=>x.id!=id); renderTabla();
+}
+
+function actualizarProducto(id,campo,valor){ const p=productos.find(x=>x.id==id); if(p) p[campo]=valor; }
+
+function renderTabla(){
+  const cont=document.getElementById('tabla-productos');
+  if(!productos.length){ cont.innerHTML='<p style="font-size:11px;color:#333;text-align:center;padding:1rem">Sin productos. Sube un archivo o agrega manualmente.</p>'; return; }
+  cont.innerHTML=productos.map(p=>`
+    <div class="tabla-row" ondragover="event.preventDefault()" ondrop="asignarImgAProducto(${p.id})">
+      <div class="img-slot" onclick="asignarImgAProducto(${p.id})" title="Clic o arrastra imagen aquí">
+        ${p.imgUrl?`<img src="${p.imgUrl}">`:'<i class="ti ti-photo"></i>'}
+      </div>
       <input value="${escHtml(p.nombre)}" placeholder="Nombre" onchange="actualizarProducto(${p.id},'nombre',this.value)">
       <input value="${escHtml(p.categoria)}" placeholder="Categoría" onchange="actualizarProducto(${p.id},'categoria',this.value)">
       <input value="${escHtml(p.descripcion)}" placeholder="Descripción" onchange="actualizarProducto(${p.id},'descripcion',this.value)">
@@ -277,249 +448,146 @@ function renderTabla() {
   `).join('');
 }
 
-function fileToBase64(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.readAsDataURL(file);
-  });
-}
+// ---- GENERAR ----
+async function generarCatalogo(){
+  const empresa=document.getElementById('empresa').value.trim();
+  const catVal=document.getElementById('categoria').value;
+  if(!empresa){ toast('Ingresa el nombre de la empresa'); return; }
+  if(!catVal){ toast('Selecciona una categoría'); return; }
+  if(modoActual==='imagenes' && !imgs1.length){ toast('Sube al menos una imagen'); return; }
+  if(modoActual==='completo' && !productos.length){ toast('Agrega al menos un producto'); return; }
 
-function escHtml(str) {
-  return (str||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+  document.getElementById('btn-generar').disabled=true;
+  document.getElementById('loading-catalogo').style.display='block';
+  document.getElementById('resultado').style.display='none';
 
-document.getElementById('input-archivo').addEventListener('change', async function() {
-  const file = this.files[0];
-  if (!file) return;
-  document.getElementById('info-archivo').innerHTML = `<div class="file-item"><i class="ti ti-file"></i><span>${file.name}</span></div>`;
-  document.getElementById('st-archivo').innerHTML = '<div class="dot on"></div>Archivo cargado';
-
-  if (file.name.endsWith('.pdf')) {
-    document.getElementById('loading-ia').style.display = 'block';
-    const formData = new FormData();
-    formData.append('archivo', file);
-    try {
-      const res = await fetch(SERVER + '/leer-pdf', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.ok && data.productos.length) {
-        data.productos.forEach(p => agregarProducto(p.nombre, p.categoria, p.descripcion, p.precio));
-        toast(data.productos.length + ' productos extraídos del PDF');
+  try{
+    if(modoActual==='imagenes'){
+      const cats={};
+      imgs1.forEach(img=>{ const c=img.categoria||'General'; if(!cats[c]) cats[c]=[]; cats[c].push(img); });
+      catalogoData={ titulo: empresa+' — Catálogo', descripcion:'', categorias: Object.keys(cats).map(c=>({ nombre:c, productos: cats[c].map(img=>({ nombre:img.nombre, descripcion:'', precio:'', imgUrl:img.base64 })) })) };
+      mostrarResultado(catalogoData, catVal);
+    } else {
+      const res=await fetch(SERVER+'/generar-catalogo',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ empresa, categoria:catVal, productos, estilo:estiloSeleccionado })
+      });
+      const data=await res.json();
+      if(data.ok && data.catalogo){
+        data.catalogo.categorias.forEach(cat=>{
+          cat.productos.forEach(p=>{
+            const match=productos.find(x=>x.nombre&&p.nombre&&x.nombre.toLowerCase().includes(p.nombre.toLowerCase().substring(0,6)));
+            if(match) p.imgUrl=match.imgUrl||'';
+          });
+        });
+        catalogoData=data.catalogo;
+        mostrarResultado(catalogoData, catVal);
       }
-    } catch(e) { toast('Error leyendo PDF'); }
-    document.getElementById('loading-ia').style.display = 'none';
-  }
-});
-
-document.getElementById('input-imagenes').addEventListener('change', async function() {
-  const files = Array.from(this.files);
-  if (!files.length) return;
-  document.getElementById('st-imagenes').innerHTML = '<div class="dot on"></div>Imágenes cargadas';
-  document.getElementById('info-imagenes').innerHTML = files.map(f => `<div class="file-item"><i class="ti ti-photo"></i><span>${f.name}</span></div>`).join('');
-  document.getElementById('loading-ia').style.display = 'block';
-
-  for (const file of files) {
-    const base64 = await fileToBase64(file);
-    const formData = new FormData();
-    formData.append('imagen', file);
-    try {
-      const res = await fetch(SERVER + '/analizar-imagen', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.ok) {
-        agregarProducto(data.producto.nombre, data.producto.categoria, data.producto.descripcion, '', base64);
-      }
-    } catch(e) { console.error(e); }
-  }
-
-  document.getElementById('loading-ia').style.display = 'none';
-  toast(files.length + ' imágenes analizadas');
-});
-
-async function generarCatalogo() {
-  const empresa = document.getElementById('empresa').value.trim();
-  const categoria = document.getElementById('categoria').value;
-  if (!empresa) { toast('Ingresa el nombre de la empresa'); return; }
-  if (!categoria) { toast('Selecciona una categoría'); return; }
-  if (!productos.length) { toast('Agrega al menos un producto'); return; }
-
-  document.getElementById('btn-generar').disabled = true;
-  document.getElementById('loading-catalogo').style.display = 'block';
-  document.getElementById('resultado').style.display = 'none';
-
-  try {
-    const res = await fetch(SERVER + '/generar-catalogo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa, categoria, productos, estilo: estiloSeleccionado })
-    });
-    const data = await res.json();
-    if (data.ok && data.catalogo) {
-      catalogoData = data.catalogo;
-      productosBackup = productos.map(p => ({ ...p, imgUsed: false }));
-      mostrarResultado(data.catalogo);
     }
-  } catch(e) { toast('Error: ' + e.message); }
+  }catch(e){ toast('Error: '+e.message); }
 
-  document.getElementById('btn-generar').disabled = false;
-  document.getElementById('loading-catalogo').style.display = 'none';
+  document.getElementById('btn-generar').disabled=false;
+  document.getElementById('loading-catalogo').style.display='none';
 }
 
-function matchImagen(pNombre) {
-  if (!pNombre) return null;
-  const needle = pNombre.toLowerCase().trim();
-  let best = null, bestScore = 0, bestIdx = -1;
-  productosBackup.forEach((x, i) => {
-    if (!x.imgUrl || x.imgUsed) return;
-    const hay = (x.nombre||'').toLowerCase().trim();
-    let score = 0;
-    if (hay === needle) score = 100;
-    else if (hay.includes(needle) || needle.includes(hay)) score = 50;
-    else { hay.split(' ').forEach(w => { if (needle.includes(w) && w.length > 3) score += 10; }); }
-    if (score > bestScore) { bestScore = score; best = x; bestIdx = i; }
-  });
-  if (best && bestScore > 0) { productosBackup[bestIdx].imgUsed = true; return best.imgUrl; }
-  const unused = productosBackup.find(x => x.imgUrl && !x.imgUsed);
-  if (unused) { unused.imgUsed = true; return unused.imgUrl; }
-  return null;
-}
-
-function mostrarResultado(cat) {
-  const cont = document.getElementById('resultado-contenido');
-  const usedImgs = {};
-  const cats = (cat.categorias||[]).map(c => `
+function mostrarResultado(cat, catVal){
+  const cont=document.getElementById('resultado-contenido');
+  const cats=(cat.categorias||[]).map(c=>`
     <div style="margin-bottom:1.5rem">
       <div class="categoria-titulo">${c.nombre}</div>
-      ${(c.productos||[]).map(p => {
-        const img = matchImagen(p.nombre);
-        const imgHtml = img ? `<img src="${img}" style="width:90px;height:90px;object-fit:cover;border-radius:8px;flex-shrink:0">` : `<div style="width:90px;height:90px;border-radius:8px;background:#1a1a1a;border:1px solid #222;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-photo" style="font-size:20px;color:#333"></i></div>`;
-        return `<div style="display:flex;align-items:center;gap:14px;background:#0D0D0D;border:1px solid #1e1e1e;border-radius:12px;padding:12px;margin-bottom:8px">
-          ${imgHtml}
-          <div style="flex:1;min-width:0">
-            <div class="producto-nombre">${p.nombre}</div>
-            <div class="producto-desc" style="margin-top:4px">${p.descripcion}</div>
-            ${p.precio?`<div class="producto-precio" style="margin-top:8px">$${p.precio}</div>`:''}
-          </div>
-        </div>`;
-      }).join('')}
+      ${modoActual==='imagenes'
+        ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">${(c.productos||[]).map(p=>`
+            <div style="background:#0D0D0D;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden">
+              ${p.imgUrl?`<img src="${p.imgUrl}" style="width:100%;height:140px;object-fit:cover">`:``}
+              <div style="padding:10px"><div style="font-size:12px;font-weight:600;color:#fff">${p.nombre}</div></div>
+            </div>`).join('')}</div>`
+        : (c.productos||[]).map(p=>`
+            <div style="display:flex;align-items:center;gap:14px;background:#0D0D0D;border:1px solid #1e1e1e;border-radius:12px;padding:12px;margin-bottom:8px">
+              ${p.imgUrl?`<img src="${p.imgUrl}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`:`<div style="width:80px;height:80px;border-radius:8px;background:#1a1a1a;border:1px solid #222;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-photo" style="font-size:20px;color:#333"></i></div>`}
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:4px">${p.nombre}</div>
+                <div style="font-size:11px;color:#555;line-height:1.5">${p.descripcion||''}</div>
+                ${p.precio?`<div style="font-size:14px;font-weight:700;color:#fff;margin-top:8px">$${p.precio}</div>`:''}
+              </div>
+            </div>`).join('')
+      }
     </div>
   `).join('');
-  cont.innerHTML = `<div class="resultado-titulo">${cat.titulo}</div><div class="resultado-desc">${cat.descripcion}</div>${cats}`;
-  document.getElementById('resultado').style.display = 'block';
+  cont.innerHTML=`<div class="resultado-titulo">${cat.titulo}</div>${cat.descripcion?`<div class="resultado-desc">${cat.descripcion}</div>`:''}${cats}`;
+  document.getElementById('resultado').style.display='block';
 }
 
-function descargarPDF() {
-  if (!catalogoData) return;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-  const empresa = document.getElementById('empresa').value || 'Catalogo';
-  const W = 210, margin = 16;
-  let y = 20;
+// ---- PDF ----
+function descargarPDF(){
+  if(!catalogoData) return;
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  const empresa=document.getElementById('empresa').value||'Catalogo';
+  const catVal=document.getElementById('categoria').value||'otro';
+  const pal=PALETAS[catVal]||PALETAS.otro;
+  const W=210, margin=16;
+  let y=20;
 
-  doc.setFillColor(10,10,10);
-  doc.rect(0,0,W,297,'F');
+  const newPage=()=>{ doc.addPage(); doc.setFillColor(...pal.bg); doc.rect(0,0,W,297,'F'); y=20; };
 
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(20);
-  doc.setTextColor(255,255,255);
-  doc.text(catalogoData.titulo || empresa, margin, y);
-  y += 8;
+  doc.setFillColor(...pal.bg); doc.rect(0,0,W,297,'F');
 
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(9);
-  doc.setTextColor(136,136,136);
-  const desc = doc.splitTextToSize(catalogoData.descripcion || '', W - margin*2);
-  doc.text(desc, margin, y);
-  y += desc.length * 5 + 8;
+  // PORTADA
+  doc.setFont('helvetica','bold'); doc.setFontSize(24); doc.setTextColor(...pal.texto);
+  doc.text(catalogoData.titulo||empresa, margin, y); y+=10;
+  if(catalogoData.descripcion){ doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...pal.sub); const d=doc.splitTextToSize(catalogoData.descripcion,W-margin*2); doc.text(d,margin,y); y+=d.length*5+8; }
+  doc.setDrawColor(40,40,40); doc.line(margin,y,W-margin,y); y+=10;
 
-  doc.setDrawColor(30,30,30);
-  doc.line(margin, y, W-margin, y);
-  y += 8;
-
-  const imgPool = productos.filter(p => p.imgUrl && p.imgUrl.startsWith('data:')).map(p => ({ nombre: p.nombre, img: p.imgUrl, used: false }));
-
-  function getImg(pNombre) {
-    if (!pNombre || !imgPool.length) return null;
-    const needle = pNombre.toLowerCase().trim();
-    let best = null, bestScore = 0, bestIdx = -1;
-    imgPool.forEach((x, i) => {
-      if (x.used) return;
-      const hay = (x.nombre||'').toLowerCase().trim();
-      let score = 0;
-      if (hay === needle) score = 100;
-      else if (hay.includes(needle) || needle.includes(hay)) score = 50;
-      else {
-        hay.split(' ').forEach(w => { if (needle.includes(w) && w.length > 3) score += 10; });
-      }
-      if (score > bestScore) { bestScore = score; best = x; bestIdx = i; }
+  if(modoActual==='imagenes'){
+    // GRID 3 columnas
+    const cols=3, cw=(W-margin*2-cols*4)/cols, ch=55;
+    (catalogoData.categorias||[]).forEach(cat=>{
+      if(y>260) newPage();
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...pal.texto);
+      doc.text((cat.nombre||'').toUpperCase(), margin, y); y+=2;
+      doc.setDrawColor(40,40,40); doc.line(margin,y+1,W-margin,y+1); y+=7;
+      let col=0, rowY=y;
+      (cat.productos||[]).forEach(p=>{
+        if(rowY+ch>275) { newPage(); rowY=y; col=0; }
+        const x=margin+col*(cw+4);
+        doc.setFillColor(...pal.card); doc.roundedRect(x,rowY,cw,ch,3,3,'F');
+        if(p.imgUrl&&p.imgUrl.startsWith('data:')){
+          try{ doc.addImage(p.imgUrl,'JPEG',x+1,rowY+1,cw-2,ch-14,'','FAST'); }catch(e){}
+        }
+        doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...pal.texto);
+        doc.text(doc.splitTextToSize(p.nombre||'',cw-2)[0], x+2, rowY+ch-8);
+        col++; if(col>=cols){ col=0; rowY+=ch+4; }
+      });
+      y=(col>0?rowY+ch+4:rowY)+6;
     });
-    if (best && bestScore > 0) { imgPool[bestIdx].used = true; return best.img; }
-    const unused = imgPool.find(x => !x.used);
-    if (unused) { unused.used = true; return unused.img; }
-    return null;
+  } else {
+    // LISTA
+    (catalogoData.categorias||[]).forEach(cat=>{
+      if(y>265) newPage();
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...pal.texto);
+      doc.text((cat.nombre||'').toUpperCase(), margin, y); y+=2;
+      doc.setDrawColor(40,40,40); doc.line(margin,y+1,W-margin,y+1); y+=7;
+      (cat.productos||[]).forEach(p=>{
+        const cardH=34;
+        if(y+cardH>278) newPage();
+        doc.setFillColor(...pal.card); doc.roundedRect(margin,y,W-margin*2,cardH,3,3,'F');
+        let tx=margin+4;
+        if(p.imgUrl&&p.imgUrl.startsWith('data:')){
+          try{ doc.addImage(p.imgUrl,'JPEG',margin+3,y+3,28,28,'','FAST'); tx=margin+34; }catch(e){}
+        }
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...pal.texto);
+        doc.text(p.nombre||'', tx, y+9);
+        if(p.descripcion){ doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...pal.sub); doc.text(doc.splitTextToSize(p.descripcion,W-margin-tx-25).slice(0,2), tx, y+15); }
+        if(p.precio){ doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...pal.texto); doc.text('$'+p.precio, W-margin-4, y+22, {align:'right'}); }
+        y+=cardH+4;
+      }); y+=4;
+    });
   }
 
-  const cardH = 34;
-  const imgW = 28, imgH = 28;
-
-  (catalogoData.categorias || []).forEach(cat => {
-    if (y > 265) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
-
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(8);
-    doc.setTextColor(255,255,255);
-    doc.text((cat.nombre||'').toUpperCase(), margin, y);
-    y += 2;
-    doc.setDrawColor(40,40,40);
-    doc.line(margin, y+1, W-margin, y+1);
-    y += 6;
-
-    (cat.productos || []).forEach(p => {
-      if (y + cardH > 278) { doc.addPage(); doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F'); y = 20; }
-
-      doc.setFillColor(18,18,18);
-      doc.roundedRect(margin, y, W-margin*2, cardH, 3, 3, 'F');
-
-      const imgData = getImg(p.nombre);
-      let textX = margin + 4;
-
-      if (imgData) {
-        try {
-          doc.addImage(imgData, 'JPEG', margin+3, y+3, imgW, imgH, '', 'FAST');
-          textX = margin + imgW + 6;
-        } catch(e) {}
-      }
-
-      const textW = W - margin - textX - 30;
-      doc.setFont('helvetica','bold');
-      doc.setFontSize(9);
-      doc.setTextColor(255,255,255);
-      doc.text(p.nombre || '', textX, y+9);
-
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(136,136,136);
-      const dl = doc.splitTextToSize(p.descripcion || '', textW);
-      doc.text(dl.slice(0,2), textX, y+15);
-
-      if (p.precio) {
-        doc.setFont('helvetica','bold');
-        doc.setFontSize(10);
-        doc.setTextColor(255,255,255);
-        doc.text('$'+p.precio, W-margin-4, y+22, { align:'right' });
-      }
-
-      y += cardH + 4;
-    });
-    y += 4;
-  });
-
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(8);
-  doc.setTextColor(50,50,50);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(50,50,50);
   doc.text('Generado con CatalogAI', margin, 290);
-  doc.text(new Date().toLocaleDateString('es-CO'), W-margin, 290, { align:'right' });
-
-  doc.save(empresa.replace(/\s+/g,'-') + '-catalogo.pdf');
+  doc.text(new Date().toLocaleDateString('es-CO'), W-margin, 290, {align:'right'});
+  doc.save(empresa.replace(/\s+/g,'-')+'-catalogo.pdf');
   toast('PDF descargado');
 }
 </script>
